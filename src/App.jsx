@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import LandingPage from "./components/LandingPage";
 import Module0b_PokemonCards from "./components/module0b-pokemon-cards/Module0b_PokemonCards";
-import Module1_Barplot from "./components/plots/Module1_Barplot";
+import Module1_Barplot from "./components/module1-barplot/Module1_Barplot";
 import "./App.css";
 
 export default function App() {

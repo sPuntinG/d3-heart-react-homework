@@ -33,22 +33,56 @@ folders, so it exists on disk but isn't pushed to GitHub. This file (CLAUDE.md) 
 repo root specifically so it *is* tracked and travels with the repo.
 
 Quick shape, as of now:
-- `src/App.jsx` — routes (`/` → LandingPage, `/module1` → Module1_Barplot)
-- `src/components/Navigation.jsx` — left sidebar nav
+- `src/App.jsx` — routes (`/` → LandingPage, `/module0b` → Module0b_PokemonCards, `/module1` → Module1_Barplot)
+- `src/components/Navigation.jsx` — left sidebar nav (the `modules` array is the source of truth for links)
 - `src/components/LandingPage.jsx` — home page (see to-do #3 below, it's an AI-drafted placeholder)
-- `src/components/plots/Module1_Barplot.jsx` — first D3 visualization module
+- `src/components/module0b-pokemon-cards/` — Pokémon cards mini-app (migrated from its own repo)
+- `src/components/module1-barplot/Module1_Barplot.jsx` — first D3 visualization module
+
+## Conventions
+
+**Module numbering.** `module0a`, `module0b`, … are the "Web Foundations" pre-modules (small
+web apps, no D3 plotting focus). `module1`–`module10` are the actual D3/React plotting modules.
+
+**One folder per module**, kebab-case, named after its content — `module0b-pokemon-cards/`.
+Component files inside stay PascalCase (`Module0b_PokemonCards.jsx`). There is no shared
+`plots/` folder — every module, chart or mini-app, gets its own folder at the same level.
+
+**CSS: theme-global + module-scoped.** `src/index.css` owns the site theme — colours, fonts and
+spacing as CSS variables, plus the dark-mode block. Modules do *not* redefine `body` or bare
+`h1`/`h2` selectors, because CSS is global and that would leak into every other page.
+Instead each module's stylesheet is wrapped in one uniquely-named class matching a wrapper
+`<div>` in its JSX, using native CSS nesting:
+
+```css
+.pokemon-cards {
+  /* wrapper styling */
+  h1 { ... }          /* → .pokemon-cards h1, scoped to this module only */
+  .type-badge { ... }
+}
+```
+
+Prefer `var(--bg)`, `var(--text)` etc. over hardcoded colours so dark mode keeps working.
 
 ## To-do list (things to not forget when resuming)
 
 1. **Migrate the older standalone projects into this repo as new modules/routes:**
-   - `docs/old-projects-to-migrate-here/pokemon-cards-app` (source: https://github.com/sPuntinG/pokemon-cards-app)
-   - `docs/old-projects-to-migrate-here/module1-intro-project`
+   - ~~`pokemon-cards-app`~~ — **done**, now `src/components/module0b-pokemon-cards/` at `/module0b`
+   - `docs/old-projects-to-migrate-here/module1-intro-project` → becomes `module0a-*`
    - "Flashy portfolio" landing page — **not yet copied into this repo**:
      https://github.com/sPuntinG/portfolio
-   - Follow the "How to Add a New Module" pattern in the architecture doc referenced above.
+   - Follow the "How to Add a New Module" pattern in the architecture doc referenced above,
+     plus the Conventions section above.
 
 2. **Improve the UI** — current styling and layout are minimal/default. Revisit spacing,
-   layout, and overall visual polish once there's more content to arrange.
+   layout, and overall visual polish once there's more content to arrange. Known specifics:
+   - `#root` in `index.css` (fixed 1126px width, `text-align: center`) fights `.app-container`
+     in `App.css` (full-width flex sidebar layout). Leftover from the Vite starter template.
+   - Global `h1 { font-size: 56px }` in `index.css` is oversized inside module pages.
+   - Pokémon cards hardcode `background: white` / `color: #333`, so they don't follow dark mode.
+   - `Navigation.jsx` still lists "Coming Soon" entries for `/module2` and `/module3`, which
+     have no route — clicking them renders a blank page. Either remove them or add a
+     catch-all `<Route path="*">` fallback.
 
 3. **Rewrite the Home page text** (`src/components/LandingPage.jsx`) — current copy is an
    AI-generated placeholder/draft, needs to be rewritten in my own voice.
