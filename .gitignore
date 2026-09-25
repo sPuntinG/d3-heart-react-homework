@@ -23,9 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Ignore folder docs
-docs
-
 # Ignore "old-*" folders/files (e.g. old project dumps not worth tracking)
 old-*
 **/old-*
