@@ -74,8 +74,8 @@ Prefer `var(--bg)`, `var(--text)` etc. over hardcoded colours so dark mode keeps
    - Follow the "How to Add a New Module" pattern in the architecture doc referenced above,
      plus the Conventions section above.
 
-2. **Improve the UI** — current styling and layout are minimal/default. Revisit spacing,
-   layout, and overall visual polish once there's more content to arrange. Known specifics:
+2. **Improve the UI** — design direction is now **decided** (see "Visual design: notebook
+   look" below); implementation has **not started yet**. Known problems to fix on the way:
    - `#root` in `index.css` (fixed 1126px width, `text-align: center`) fights `.app-container`
      in `App.css` (full-width flex sidebar layout). Leftover from the Vite starter template.
    - Global `h1 { font-size: 56px }` in `index.css` is oversized inside module pages.
@@ -85,4 +85,60 @@ Prefer `var(--bg)`, `var(--text)` etc. over hardcoded colours so dark mode keeps
      catch-all `<Route path="*">` fallback.
 
 3. **Rewrite the Home page text** (`src/components/LandingPage.jsx`) — current copy is an
-   AI-generated placeholder/draft, needs to be rewritten in my own voice.
+   AI-generated placeholder/draft, needs to be rewritten in my own voice. (The text in the
+   design prototypes is placeholder too — same job, not done.)
+
+## Visual design: notebook look (decided 2026-09-25, not yet implemented)
+
+The site should look like a **hand-kept notebook**: the page is the paper, the charts are
+what's pinned onto it. Prototypes live on a private Claude design canvas:
+<https://claude.ai/artifact/8nT3gocqqCZasFyDHdkwih> — artboards A, B, C were the first three
+options, **D** was my own mix of A and B, and **D2 is the agreed final direction**. Open it
+and look at D2 before implementing anything.
+
+**D2 in words:** cream ruled paper, a red vertical margin rule separating the left nav from
+the page, Caveat handwriting for headings and nav, a plain serif for body text, mono for
+small metadata labels.
+
+Palette (light mode; dark mode deliberately not designed yet — paper texture in dark is
+awkward, decide later):
+
+| role | value |
+|---|---|
+| paper / page background | `#FAF4E6` |
+| sidebar background | `rgba(246,238,220,0.87)` |
+| ruled lines | `rgba(27,58,107,0.13)`, repeating every 32px |
+| margin rule (sidebar right border) | `#C86F66`, 2px |
+| heading ink | `#2B2A26` |
+| body ink | `#3A382F` |
+| muted / secondary text | `#5B584D`, and `#8A8172` for labels |
+| red accent (highlight, annotations) | `#A8433B` |
+| blue (chart bars, links) | `#1B3A6B` |
+| sticky-note yellow (active nav item, notes) | `#FFF4C2` |
+| text card background | `#FFFDF6BF` (75% opaque — ruled lines show through on purpose) |
+| chart card background | `#FCF7EA` (**fully opaque**) |
+
+Fonts (Google Fonts, one `<link>` in `index.html`):
+- **Caveat** 500/700 — headings, nav links, handwritten annotations
+- **Lora** 400/600 + italic — body text
+- **IBM Plex Mono** 400/500 — small uppercase labels, module numbers, axis ticks
+
+Rules that came out of the prototyping, worth keeping:
+- **Handwriting for things you'd shout across a desk, normal type for things you'd read
+  sitting down.** Caveat never gets used for paragraphs or for tiny letter-spaced uppercase.
+- **Cards with their own lines (charts, tables) are opaque; text-only cards are translucent**
+  — otherwise the ruled background tangles with the plot's axes.
+- **Line-height 1.45** on body text (I like it compact; this is a deliberate choice, not an
+  oversight — don't "fix" it back to 1.6).
+- Module numbers (`00`, `0a`, `01`) in mono are the sidebar's visual system as modules pile up.
+- Per chart: one bar colour (`#1B3A6B`), red (`#A8433B`) only on the bar being pointed at,
+  plus a short handwritten Caveat annotation saying what I noticed. The chart states the
+  fact, the handwriting says the insight.
+
+**Next step when resuming (agreed order):**
+1. Add the Google Fonts `<link>` to `index.html`.
+2. Replace the variables at the top of `src/index.css` with the palette + font stacks above.
+   That alone re-skins the whole site before touching any component.
+3. Then `Navigation.jsx` + its CSS (sidebar, margin rule, module numbers).
+4. Then the landing page, then per-module cards.
+5. Also kill the `#root` / `.app-container` conflict listed in to-do #2 while in there.
