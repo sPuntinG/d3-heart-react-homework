@@ -57,12 +57,14 @@ d3-heart-react-homework/
 │   ├── main.jsx                  ← Entry point (mounts React app)
 │   ├── App.jsx                   ← Main router component (decides what to show)
 │   ├── App.css                   ← Main layout styles (flex: sidebar + content)
-│   ├── index.css                 ← Global styles
+│   ├── index.css                 ← Global theme (colour/font variables, ruled paper, h1/h2)
+│   ├── modules.js                ← THE list of modules (feeds sidebar + home page cards)
 │   │
 │   └── components/
-│       ├── LandingPage.jsx        ← Intro page with course explanation
-│       ├── Navigation.jsx         ← Left sidebar with module buttons
-│       ├── Navigation.css         ← Sidebar styling
+│       ├── LandingPage.jsx        ← Home page: title, intro, module cards
+│       ├── LandingPage.css        ← Home page styling (scoped under .landing)
+│       ├── Navigation.jsx         ← Left sidebar with module links
+│       ├── Navigation.css         ← Sidebar styling (scoped under .navigation)
 │       │
 │       ├── module0b-pokemon-cards/  ← One folder per module
 │       │   ├── Module0b_PokemonCards.jsx
@@ -135,14 +137,18 @@ Browser loads `index.html` → loads `main.jsx` → mounts React app
 
 - `Navigation` stays on screen always (left sidebar)
 - `Routes` shows ONE component based on current URL path
-- Styling: flexbox layout with sidebar (250px) + content (flex: 1)
+- Styling: flexbox layout with sidebar (300px) + content (flex: 1)
 
 ### 4. User clicks a nav button
 
-Navigation component uses React Router's `<Link>` component:
+Navigation component uses React Router's `<NavLink>` component:
 ```jsx
-<Link to="/module1">Module 1 - Barplot</Link>
+<NavLink to="/module1" end className="nav-link">Barplot</NavLink>
 ```
+
+`NavLink` is `Link` plus one extra: when its `to` matches the current URL it automatically
+adds `class="active"`, which the CSS uses to highlight the current page. `end` = only match
+the exact URL (not sub-paths like `/module1/details`).
 
 When clicked:
 - URL changes to `.../module1`
@@ -211,22 +217,38 @@ export default defineConfig({
 - Assets (images, CSS) get correct URLs in production
 - Must match your repo name
 
+### `modules.js` — The List of Modules
+
+```javascript
+export const modules = [
+  { id: "home", num: "00", label: "Home", path: "/" },
+  {
+    id: "module1", num: "01", label: "Barplot", path: "/module1",
+    description: "Scales and axes, and what that margin convention is actually for.",
+  },
+  { id: "module2", num: "02", label: "Scales", soon: true, description: "..." },
+]
+```
+
+**Key concept:** one list, imported by every file that needs it
+(`import { modules } from "../modules"`). The sidebar and the home page cards both read
+from it, so adding a module means editing one place, and they can't drift apart.
+`soon: true` (and no `path`) marks a module that's listed but not built yet.
+
 ### `Navigation.jsx` — Sidebar Navigation
 
 ```javascript
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
+import { modules } from "../modules"
 
 export default function Navigation() {
-  const modules = [
-    { id: "home", label: "🏠 Home", path: "/" },
-    { id: "module1", label: "📊 Module 1", path: "/module1" },
-    // Add more as you progress
-  ]
-
   return (
     <nav className="navigation">
+      {/* title block + "Contents" label omitted here */}
       {modules.map(module => (
-        <Link to={module.path}>{module.label}</Link>
+        module.soon
+          ? <span className="nav-link soon">{module.num} {module.label} — soon</span>
+          : <NavLink to={module.path} end className="nav-link">{module.num} {module.label}</NavLink>
       ))}
     </nav>
   )
@@ -234,8 +256,10 @@ export default function Navigation() {
 ```
 
 **Key concept:**
-- `<Link>` is React Router's way to navigate (like `<a>` but handles routing)
-- `to={module.path}` specifies the route path
+- `<NavLink>` is React Router's way to navigate (like `<a>` but handles routing, and marks
+  the current page as `active`)
+- `condition ? A : B` (a "ternary") is JavaScript's one-line if/else — here: plain grey text
+  for upcoming modules, a real link otherwise
 
 ### `Module1_Barplot.jsx` — Visualization Component
 
@@ -328,9 +352,10 @@ export default function Module2_Scales() {
 
 ### 2. If it needs styles: scope them
 
-`src/index.css` owns the **site theme** — colours, fonts and spacing as CSS variables, plus
-the dark-mode block. Use `var(--bg)`, `var(--text)` etc. rather than hardcoding colours, or
-dark mode breaks.
+`src/index.css` owns the **site theme** — colours, fonts and spacing as CSS variables (the
+"notebook" palette; the variable names are listed in `CLAUDE.md`). Use `var(--bg)`,
+`var(--text)`, `var(--accent)` etc. rather than hardcoding colours, so the whole site can be
+re-themed (e.g. a future dark mode) from one place.
 
 A module's own stylesheet holds only what's specific to that module — and it must be
 **scoped**, because CSS is global: a bare `body` or `h1` rule in one module's file leaks into
@@ -368,15 +393,18 @@ export default function App() {
 }
 ```
 
-### 4. Add a nav button in Navigation.jsx
+### 4. Add (or update) its entry in `src/modules.js`
+
+This one entry creates both the sidebar link and the home page card:
 
 ```javascript
-const modules = [
-  { id: "home", label: "🏠 Home", path: "/" },
-  { id: "module1", label: "📊 Module 1", path: "/module1" },
-  { id: "module2", label: "📈 Module 2", path: "/module2" },  {/* NEW */}
-]
+{
+  id: "module2", num: "02", label: "Scales", path: "/module2",   // NEW
+  description: "One sentence on what this module is about.",
+},
 ```
+
+If it was already listed as upcoming, just remove `soon: true` and add the `path`.
 
 ### 5. Deploy
 
@@ -452,7 +480,7 @@ A wrong import path fails loudly at dev-server startup, so this is hard to get s
 2. `npm install` (if starting fresh)
 3. `npm run dev` (to test locally)
 4. Create new module folder + component in `src/components/moduleN-name/`
-5. Add route in `App.jsx` and nav button in `Navigation.jsx`
+5. Add route in `App.jsx` and an entry in `src/modules.js`
 6. `npm run deploy` (when ready to go live)
 
 ---

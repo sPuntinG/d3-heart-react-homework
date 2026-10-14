@@ -56,7 +56,8 @@ understand what CSS is actually doing.
 
 > **Global for the things that *should* be consistent. Local for the things specific to one module.**
 
-- `src/index.css` owns the **theme**: colours, fonts, spacing, dark mode. This stuff *should*
+- `src/index.css` owns the **theme**: colours, fonts, spacing (and dark mode, once it's
+  designed — removed for now, see the end of this note). This stuff *should*
   apply everywhere — that's what makes a portfolio look like one site rather than eight.
 - Each module's stylesheet holds only its own oddities (the pokemon type colours, the card grid).
 
@@ -90,7 +91,8 @@ That's why a module can override the global theme locally without either one kno
 the other. **But it only applies per property**: `.pokemon-cards h1` doesn't set `font-size`,
 so the theme's global `h1 { font-size: 56px }` still comes through. Properties nobody
 overrides just inherit from the theme. (This caught us out immediately — the pokemon `h1`
-rendered huge.)
+rendered huge. Since the notebook redesign the global `h1` is 60px Caveat — same mechanism,
+different number.)
 
 **`rem` units are relative to the root font size.** The theme sets root to `18px`
 (`index.css`), where the standalone app had the browser default of `16px`. So the pokemon
@@ -102,8 +104,14 @@ together — but it means copied-in styles won't look identical to their old hom
 
 ## Consequences / follow-ups
 
-- Use `var(--bg)`, `var(--text)`, `var(--shadow)` instead of hardcoded colours, or dark mode
-  silently breaks. The pokemon cards still hardcode `background: white` — outstanding.
+- Use theme variables (`var(--bg)`, `var(--text)`, `var(--accent)` …) instead of hardcoded
+  colours, so the site can be re-themed from one place. The pokemon cards still hardcode
+  `background: white` — outstanding.
+- **Update 2026-10-14 (notebook redesign):** the starter-template palette and its dark-mode
+  block were replaced by the "notebook" palette, light mode only (`color-scheme: light`)
+  until a dark version is designed. New variable names are listed in `CLAUDE.md`. The site
+  components (`Navigation.css`, `LandingPage.css`) follow the same scoping pattern as
+  modules: one wrapper class + nesting.
 - New modules: see the "How to Add a New Module" section in
   `Architecture - D3 Portfolio Single Repo Setup.md`, step 2.
 - Revisit CSS Modules if the number of modules gets large enough that the manual wrapper

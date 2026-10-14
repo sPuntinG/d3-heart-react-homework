@@ -28,14 +28,21 @@ Deployed to GitHub Pages via the `gh-pages` npm package (`npm run deploy`).
 Full architecture writeup (folder structure, routing, why this approach, how to add a new
 module, deployment flow): `docs/learning-notes/Architecture - D3 Portfolio Single Repo Setup.md`.
 
-Note: `docs/` is git-ignored (see `.gitignore`) — it holds personal notes and old project
-folders, so it exists on disk but isn't pushed to GitHub. This file (CLAUDE.md) lives at the
-repo root specifically so it *is* tracked and travels with the repo.
+Note: `docs/learning-notes/` **is** tracked by git (my learning notes travel with the repo).
+Only folders/files starting with `old-` are git-ignored — e.g.
+`docs/old-projects-to-migrate-here/` holds old project dumps that live on disk only.
 
 Quick shape, as of now:
 - `src/App.jsx` — routes (`/` → LandingPage, `/module0b` → Module0b_PokemonCards, `/module1` → Module1_Barplot)
-- `src/components/Navigation.jsx` — left sidebar nav (the `modules` array is the source of truth for links)
-- `src/components/LandingPage.jsx` — home page (see to-do #3 below, it's an AI-drafted placeholder)
+- `src/modules.js` — **the list of modules** (`id`, `num`, `label`, `path`, `description`,
+  `soon: true` for upcoming ones). Single source of truth: both the sidebar and the home
+  page cards import it.
+- `src/components/Navigation.jsx` + `.css` — left sidebar. Uses `NavLink` (adds `class="active"`
+  to the current page's link → sticky-note highlight). `soon` entries render as grey,
+  non-clickable text.
+- `src/components/LandingPage.jsx` + `.css` — home page: title, intro, grid of module cards
+  built from `modules.js` (small `CardContent` helper component). Intro text is still a
+  placeholder (to-do #3).
 - `src/components/module0b-pokemon-cards/` — Pokémon cards mini-app (migrated from its own repo)
 - `src/components/module1-barplot/Module1_Barplot.jsx` — first D3 visualization module
 
@@ -48,8 +55,11 @@ web apps, no D3 plotting focus). `module1`–`module10` are the actual D3/React 
 Component files inside stay PascalCase (`Module0b_PokemonCards.jsx`). There is no shared
 `plots/` folder — every module, chart or mini-app, gets its own folder at the same level.
 
+**Adding a module** = new folder + component, a `<Route>` in `App.jsx`, and one entry in
+`src/modules.js` (that entry feeds both the sidebar and the home page card).
+
 **CSS: theme-global + module-scoped.** `src/index.css` owns the site theme — colours, fonts and
-spacing as CSS variables, plus the dark-mode block. Modules do *not* redefine `body` or bare
+spacing as CSS variables (no dark-mode block for now, see design section). Modules do *not* redefine `body` or bare
 `h1`/`h2` selectors, because CSS is global and that would leak into every other page.
 Instead each module's stylesheet is wrapped in one uniquely-named class matching a wrapper
 `<div>` in its JSX, using native CSS nesting:
@@ -62,7 +72,13 @@ Instead each module's stylesheet is wrapped in one uniquely-named class matching
 }
 ```
 
-Prefer `var(--bg)`, `var(--text)` etc. over hardcoded colours so dark mode keeps working.
+Prefer the theme variables over hardcoded colours, so a future dark mode only needs to
+redefine the variables. Current names (top of `src/index.css`):
+- paper: `--bg`, `--sidebar-bg`, `--rule-line`, `--rule-gap`, `--margin-rule`, `--border`
+- ink: `--text-h` (headings), `--text` (body), `--muted`, `--label`
+- accents: `--accent` (red), `--blue`, `--sticky` (yellow)
+- cards: `--card-text-bg` (translucent), `--card-chart-bg` (opaque), `--code-bg`
+- fonts: `--heading` (Caveat), `--body` (Lora), `--mono` (IBM Plex Mono)
 
 ## To-do list (things to not forget when resuming)
 
@@ -74,21 +90,23 @@ Prefer `var(--bg)`, `var(--text)` etc. over hardcoded colours so dark mode keeps
    - Follow the "How to Add a New Module" pattern in the architecture doc referenced above,
      plus the Conventions section above.
 
-2. **Improve the UI** — design direction is now **decided** (see "Visual design: notebook
-   look" below); implementation has **not started yet**. Known problems to fix on the way:
-   - `#root` in `index.css` (fixed 1126px width, `text-align: center`) fights `.app-container`
-     in `App.css` (full-width flex sidebar layout). Leftover from the Vite starter template.
-   - Global `h1 { font-size: 56px }` in `index.css` is oversized inside module pages.
-   - Pokémon cards hardcode `background: white` / `color: #333`, so they don't follow dark mode.
-   - `Navigation.jsx` still lists "Coming Soon" entries for `/module2` and `/module3`, which
-     have no route — clicking them renders a blank page. Either remove them or add a
-     catch-all `<Route path="*">` fallback.
+2. **Improve the UI** — **in progress**, implementing the "notebook" design (see "Visual
+   design: notebook look" below, incl. progress + next steps). Of the original known problems:
+   - ~~`#root` vs `.app-container` conflict~~ — **fixed** (starter `#root` rule deleted).
+   - ~~Oversized global `h1 { font-size: 56px }`~~ — **fixed** (now 60px Caveat, tuned for handwriting).
+   - ~~"Coming Soon" nav links to routes that don't exist~~ — **fixed** (`soon` entries aren't links).
+   - Pokémon cards still hardcode `background: white` / `color: #333` → still open, part of
+     the per-module step.
+   - Small leftover: `Navigation.jsx` still has the old `modules` array commented out
+     (moved to `src/modules.js`) — safe to delete.
 
-3. **Rewrite the Home page text** (`src/components/LandingPage.jsx`) — current copy is an
-   AI-generated placeholder/draft, needs to be rewritten in my own voice. (The text in the
-   design prototypes is placeholder too — same job, not done.)
+3. **Rewrite the site text in my own voice** — all of it is still placeholder:
+   - home page intro paragraph (`LandingPage.jsx`)
+   - sidebar title + subtitle ("Giulia's D3 notebook" / "a data analyst learns the web",
+     in `Navigation.jsx`) — copied from the prototype
+   - module card descriptions (`description` fields in `src/modules.js`) — copied from the prototype
 
-## Visual design: notebook look (decided 2026-09-25, not yet implemented)
+## Visual design: notebook look (decided 2026-09-25, implementation in progress)
 
 The site should look like a **hand-kept notebook**: the page is the paper, the charts are
 what's pinned onto it. Prototypes live on a private Claude design canvas:
@@ -135,10 +153,33 @@ Rules that came out of the prototyping, worth keeping:
   plus a short handwritten Caveat annotation saying what I noticed. The chart states the
   fact, the handwriting says the insight.
 
-**Next step when resuming (agreed order):**
-1. Add the Google Fonts `<link>` to `index.html`.
-2. Replace the variables at the top of `src/index.css` with the palette + font stacks above.
-   That alone re-skins the whole site before touching any component.
-3. Then `Navigation.jsx` + its CSS (sidebar, margin rule, module numbers).
-4. Then the landing page, then per-module cards.
-5. Also kill the `#root` / `.app-container` conflict listed in to-do #2 while in there.
+**Progress (as of 2026-10-14):**
+1. ✅ Google Fonts `<link>` in `index.html`.
+2. ✅ Theme variables in `src/index.css` replaced with the palette + fonts; ruled lines on
+   `body` (a `repeating-linear-gradient`); old dark-mode block removed and
+   `color-scheme: light`; `App.css` white background + system font override removed.
+3. ✅ Sidebar (`Navigation.jsx` + `.css`): title block, "Contents" label, mono module
+   numbers, sticky-note active item via `NavLink`, grey "soon" entries, red margin rule.
+4. ✅ (mostly) Landing page: global `h1`/`h2` resized for Caveat, `.main-content` padding
+   set to D2's margins, module list moved to `src/modules.js`, card grid (`auto-fill`
+   columns, translucent text cards, dashed "soon" card, small tilt on hover — my addition,
+   not in D2).
+
+**Next steps when resuming (agreed order):**
+1. **Per-module styling:**
+   - Pokémon cards (`module0b`): replace hardcoded `white` / `#333` with theme variables,
+     check the module's headings still look right with the new global `h1`/`h2`.
+   - Barplot (`module1`): put the chart in an **opaque** chart card (`--card-chart-bg`),
+     bars in `--blue`, one highlighted bar in `--accent`, mono axis ticks, plus a short
+     handwritten Caveat annotation (see the "Per chart" rule above).
+2. **Rest of the landing page from D2:** the "LATEST" card (opaque, should show the real
+   barplot, not a drawing — so do it after the barplot step) and the small mono footer line
+   ("last entry — date · source on GitHub").
+3. **Tilted yellow "Note to self" sticky note** at the bottom of the sidebar — deliberately
+   parked for the very end. Key trick to explain: `margin-top: auto` inside the sidebar's
+   flex column pushes it to the bottom; `transform: rotate(-1.2deg)` tilts it.
+4. Possible polish, not decided: the ruled lines are on `body`, but the page content scrolls
+   inside `.main-content`, so the lines stay still while text scrolls past them. Moving the
+   background onto `.main-content` (with `background-attachment: local`) would make them
+   scroll with the page, like D2 intends.
+5. Later: dark mode (needs designing first).

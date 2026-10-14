@@ -1,31 +1,46 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "./Navigation.css";
+import { modules } from "../modules";
 
 export default function Navigation() {
-  const modules = [
-    { id: "home", label: "🏠 Home", path: "/" },
-    {
-      id: "module0b",
-      label: "🃏 Module 0b - Pokémon Cards",
-      path: "/module0b",
-    },
-    { id: "module1", label: "📊 Module 1 - Barplot", path: "/module1" },
-    { id: "module2", label: "📈 Module 2 - (Coming Soon)", path: "/module2" },
-    { id: "module3", label: "📉 Module 3 - (Coming Soon)", path: "/module3" },
-  ];
+  // const modules = [
+  //   { id: "home", num: "00", label: "Home", path: "/" },
+  //   { id: "module0b", num: "0b", label: "Pokémon cards", path: "/module0b" },
+  //   { id: "module1", num: "01", label: "Barplot", path: "/module1" },
+  //   { id: "module2", num: "02", label: "Scales", soon: true },
+  // ];
 
   return (
     <nav className="navigation">
-      <div className="nav-title">Modules</div>
-      <ul className="nav-list">
-        {modules.map((module) => (
-          <li key={module.id}>
-            <Link to={module.path} className="nav-link">
-              {module.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
+      <div>
+        <div className="nav-title">
+          Giulia's
+          <br />
+          D3 notebook
+        </div>
+        <p className="nav-subtitle">a data analyst learns the web</p>
+      </div>
+
+      <div>
+        <div className="nav-label">Contents</div>
+        <ul className="nav-list">
+          {modules.map((module) => (
+            <li key={module.id}>
+              {module.soon ? (
+                <span className="nav-link soon">
+                  <span className="nav-num">{module.num}</span>
+                  {module.label} — soon
+                </span>
+              ) : (
+                <NavLink to={module.path} end className="nav-link">
+                  <span className="nav-num">{module.num}</span>
+                  {module.label}
+                </NavLink>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
     </nav>
   );
 }
