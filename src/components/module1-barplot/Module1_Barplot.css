@@ -1,0 +1,36 @@
+.barplot {
+  .chart-card {
+    background: var(--card-chart-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    width: fit-content;
+
+    .bar {
+      fill: var(--blue);
+    }
+
+    .bar.highlight {
+      fill: var(--accent);
+    }
+
+    .country-label {
+      font-family: var(--mono);
+      font-size: 12px;
+      fill: var(--text);
+    }
+
+    .value-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      fill: var(--muted);
+    }
+
+    .chart-note {
+      font-family: var(--heading);
+      font-size: 13px;
+      color: var(--accent);
+      margin: 8px 0 0 0;
+    }
+  }
+}

@@ -172,19 +172,26 @@ Rules that came out of the prototyping, worth keeping:
      use a retro **VT323** font; the page title stays in the notebook style. `h2` and
      buttons need their own `font-family` (global `h2` rule / buttons don't inherit).
 
+6. ✅ Barplot (`module1`), done 2026-10-23. New `Module1_Barplot.css`, scoped under
+   `.barplot`; all inline SVG styling moved to CSS classes. Opaque `.chart-card`; bars
+   `.bar` (`--blue`) / `.bar.highlight` (`--accent`); `.country-label` / `.value-label` in
+   mono; `.chart-note` handwritten note below the chart (size/wording are my own choice).
+   The red bar is picked **at random** on each page load (`highlighted` const, via
+   `Math.random()`), and the note jokes about it. Debugging trick learned along the way →
+   `docs/learning-notes/Tricks - Debugging & Dev Tools.md` (add future tricks there).
+   Leftover: commented-out `// fontSize` / `// fill` lines in the JSX, safe to delete.
+
 **Next steps when resuming (agreed order):**
-1. **Per-module styling:**
-   - Barplot (`module1`): put the chart in an **opaque** chart card (`--card-chart-bg`),
-     bars in `--blue`, one highlighted bar in `--accent`, mono axis ticks, plus a short
-     handwritten Caveat annotation (see the "Per chart" rule above).
-2. **Rest of the landing page from D2:** the "LATEST" card (opaque, should show the real
-   barplot, not a drawing — so do it after the barplot step) and the small mono footer line
-   ("last entry — date · source on GitHub").
-3. **Tilted yellow "Note to self" sticky note** at the bottom of the sidebar — deliberately
+1. **Rest of the landing page from D2:** the "LATEST" card (opaque, shows the real
+   barplot, not a drawing) and the small mono footer line ("last entry — date · source on
+   GitHub"). Heads-up: `Module1_Barplot` currently bundles its own `h2` + intro `<p>` with
+   the chart, so showing just the chart on the home page probably means splitting the chart
+   into its own small component first — explain that idea before doing it.
+2. **Tilted yellow "Note to self" sticky note** at the bottom of the sidebar — deliberately
    parked for the very end. Key trick to explain: `margin-top: auto` inside the sidebar's
    flex column pushes it to the bottom; `transform: rotate(-1.2deg)` tilts it.
-4. Possible polish, not decided: the ruled lines are on `body`, but the page content scrolls
+3. Possible polish, not decided: the ruled lines are on `body`, but the page content scrolls
    inside `.main-content`, so the lines stay still while text scrolls past them. Moving the
    background onto `.main-content` (with `background-attachment: local`) would make them
    scroll with the page, like D2 intends.
-5. Later: dark mode (needs designing first).
+4. Later: dark mode (needs designing first).

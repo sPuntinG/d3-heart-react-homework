@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import * as d3 from "d3";
+import "./Module1_Barplot.css";
 
 export default function Module1_Barplot() {
   const data = [
@@ -25,6 +26,8 @@ export default function Module1_Barplot() {
     { country: "New Zealand", students: 3 },
   ];
 
+  const highlighted = data[Math.floor(Math.random() * data.length)].country;
+
   const width = 500;
   const height = 400;
   const margin = { top: 20, right: 40, bottom: 20, left: 130 };
@@ -45,54 +48,52 @@ export default function Module1_Barplot() {
   }, [data, innerHeight]);
 
   return (
-    <div>
+    <div className="barplot">
       <h2>Module 1: Introduction to D3 & React</h2>
       <p>Students enrolled in the first cohort of this course</p>
-      <svg
-        width={width}
-        height={height}
-        style={{
-          backgroundColor: "#fcfcfc",
-          border: "1px solid #eee",
-          borderRadius: "8px",
-        }}
-      >
-        <g transform={`translate(${margin.left}, ${margin.top})`}>
-          {data.map((d) => (
-            <g key={d.country}>
-              <text
-                x={-10}
-                y={yScale(d.country) + yScale.bandwidth() / 2}
-                textAnchor="end"
-                dominantBaseline="central"
-                fontSize="14px"
-                fill="#333"
-              >
-                {d.country}
-              </text>
+      <div className="chart-card">
+        <svg width={width} height={height}>
+          <g transform={`translate(${margin.left}, ${margin.top})`}>
+            {data.map((d) => (
+              <g key={d.country}>
+                <text
+                  x={-10}
+                  y={yScale(d.country) + yScale.bandwidth() / 2}
+                  textAnchor="end"
+                  dominantBaseline="central"
+                  className="country-label"
+                >
+                  {d.country}
+                </text>
 
-              <rect
-                x={0}
-                y={yScale(d.country)}
-                width={xScale(d.students)}
-                height={yScale.bandwidth()}
-                fill="#3b82f6"
-                rx={2}
-              />
+                <rect
+                  x={0}
+                  y={yScale(d.country)}
+                  width={xScale(d.students)}
+                  height={yScale.bandwidth()}
+                  className={
+                    d.country === highlighted ? "bar highlight" : "bar"
+                  }
+                  rx={2}
+                />
 
-              <text
-                x={xScale(d.students) + 8}
-                y={yScale(d.country) + yScale.bandwidth() / 2}
-                dominantBaseline="central"
-                fontSize="10px"
-                fill="#666"
-              >
-                {d.students}
-              </text>
-            </g>
-          ))}
-        </g>
-      </svg>
+                <text
+                  x={xScale(d.students) + 8}
+                  y={yScale(d.country) + yScale.bandwidth() / 2}
+                  dominantBaseline="central"
+                  className="value-label"
+                >
+                  {d.students}
+                </text>
+              </g>
+            ))}
+          </g>
+        </svg>
+        <p className="chart-note">
+          A country is highlighted at random, and now you're looking at it for
+          no real reason :p (try refreshing to see it change)
+        </p>
+      </div>
     </div>
   );
 }
