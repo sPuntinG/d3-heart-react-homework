@@ -4,7 +4,6 @@
 
   h1 {
     text-align: center;
-    color: #2c3e50;
     margin-bottom: 10px;
   }
 
@@ -13,6 +12,7 @@
     /* This creates a responsive grid that automatically wraps cards */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 21px;
+    font-family: "VT323", monospace;
   }
 
   .pokemon-card {
@@ -42,7 +42,7 @@
   }
 
   .pokemon-id {
-    color: #888;
+    color: #0f0f0fef;
     font-weight: bold;
   }
 
@@ -97,12 +97,13 @@
   h2 {
     margin: 0 0 0 0;
     font-size: 1.2rem;
+    font-family: "VT323", monospace;
     text-transform: capitalize;
   }
 
   h3 {
     margin: 0 0 50px 0;
-    color: #2c3e50d5;
+    color: var(--muted);
     text-align: center;
     font-style: normal;
     font-size: 1.25rem;
@@ -119,6 +120,7 @@
     gap: 10px;
     margin-bottom: 30px;
     margin-top: 20px;
+    font-family: "VT323", monospace;
   }
 
   .filter-btn {
@@ -133,6 +135,7 @@
     transition:
       opacity 0.2s,
       transform 0.1s;
+    font-family: "VT323", monospace;
   }
 
   .filter-btn:hover {

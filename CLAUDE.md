@@ -95,8 +95,8 @@ redefine the variables. Current names (top of `src/index.css`):
    - ~~`#root` vs `.app-container` conflict~~ — **fixed** (starter `#root` rule deleted).
    - ~~Oversized global `h1 { font-size: 56px }`~~ — **fixed** (now 60px Caveat, tuned for handwriting).
    - ~~"Coming Soon" nav links to routes that don't exist~~ — **fixed** (`soon` entries aren't links).
-   - Pokémon cards still hardcode `background: white` / `color: #333` → still open, part of
-     the per-module step.
+   - ~~Pokémon cards hardcode `background: white` / `color: #333`~~ — **resolved**: white
+     cards are kept on purpose (see Progress step 5), `#333` is badge text and stays.
    - Small leftover: `Navigation.jsx` still has the old `modules` array commented out
      (moved to `src/modules.js`) — safe to delete.
 
@@ -153,7 +153,7 @@ Rules that came out of the prototyping, worth keeping:
   plus a short handwritten Caveat annotation saying what I noticed. The chart states the
   fact, the handwriting says the insight.
 
-**Progress (as of 2026-10-14):**
+**Progress (as of 2026-10-23):**
 1. ✅ Google Fonts `<link>` in `index.html`.
 2. ✅ Theme variables in `src/index.css` replaced with the palette + fonts; ruled lines on
    `body` (a `repeating-linear-gradient`); old dark-mode block removed and
@@ -164,11 +164,16 @@ Rules that came out of the prototyping, worth keeping:
    set to D2's margins, module list moved to `src/modules.js`, card grid (`auto-fill`
    columns, translucent text cards, dashed "soon" card, small tilt on hover — my addition,
    not in D2).
+5. ✅ Pokémon cards (`module0b`), done 2026-10-23. Decisions:
+   - Cards stay **white** (not a theme colour): they read as real cards pinned onto the paper.
+   - Rule for colours: notebook things (paper, ink, headings) use theme variables; Pokémon
+     things (type badge colours and their white/`#333` text) keep their own colours.
+   - The Pokémon parts (`.pokemon-grid`, `.filter-container`, card `h2` names, `.filter-btn`)
+     use a retro **VT323** font; the page title stays in the notebook style. `h2` and
+     buttons need their own `font-family` (global `h2` rule / buttons don't inherit).
 
 **Next steps when resuming (agreed order):**
 1. **Per-module styling:**
-   - Pokémon cards (`module0b`): replace hardcoded `white` / `#333` with theme variables,
-     check the module's headings still look right with the new global `h1`/`h2`.
    - Barplot (`module1`): put the chart in an **opaque** chart card (`--card-chart-bg`),
      bars in `--blue`, one highlighted bar in `--accent`, mono axis ticks, plus a short
      handwritten Caveat annotation (see the "Per chart" rule above).
